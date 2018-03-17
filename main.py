@@ -10,7 +10,7 @@ import json
 import aiohttp
 from discord.ext import commands
 from threading import Thread
-from flask import Flask, Response
+from flask import Flask, Response, request
 
 import config
 from cogs.utils.tools import *
@@ -198,12 +198,24 @@ def start_bot():
 
 @app.route("/commands")
 def get_commands():
+
+    content_type = "application/json"
+    auth = request.headers.get("authorization")
+    statuses = {
+        "OK": 200,
+        "UN_AUTH": 401,
+        "NO_AUTH": 403
+    }
+    if auth is None:
+        return Response(json.dumps({"msg": "Authorization required"}), status=statuses["NO_AUTH"], mimetype=content_type)
+
+    if auth != config.api_token:
+        return Response(json.dumps({"msg": "Unauthorized"}), status=statuses["UN_AUTH"], mimetype=content_type)
+
     command_list = []
     for cog in bot.cogs:
-        command_list.append({"cog_name": cog, "commands": list(map(lambda x: ({"name": x.name, "usage": x.signature}), bot.get_cog_commands(cog)))})
-    resp = Response(json.dumps(command_list))
-    resp.headers["content-type"] = "json"
-    return resp
+        command_list.append({"cog_name": cog, "commands": list(map(lambda x: ({"name": x.name, "usage": x.signature, "description": x.help}), bot.get_cog_commands(cog)))})
+    return Response(json.dumps(command_list), status=statuses["OK"], mimetype=content_type)
 
 
 def start_web():
