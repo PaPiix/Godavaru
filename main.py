@@ -196,26 +196,30 @@ def start_bot():
     bot.run(config.token)
 
 
-@app.route("/commands")
-def get_commands():
-
-    content_type = "application/json"
-    auth = request.headers.get("authorization")
-    statuses = {
+web_resources = {
+    "statuses": {
         "OK": 200,
         "UN_AUTH": 401,
         "NO_AUTH": 403
-    }
+    },
+    "content_type": "application/json"
+}
+
+
+@app.route("/commands")
+def get_commands():
+
+    auth = request.headers.get("authorization")
     if auth is None:
-        return Response(json.dumps({"msg": "Authorization required"}), status=statuses["NO_AUTH"], mimetype=content_type)
+        return Response(json.dumps({"msg": "Authorization required"}), status=web_resources["statuses"]["NO_AUTH"], mimetype=web_resources["content_type"])
 
     if auth != config.api_token:
-        return Response(json.dumps({"msg": "Unauthorized"}), status=statuses["UN_AUTH"], mimetype=content_type)
+        return Response(json.dumps({"msg": "Unauthorized"}), status=web_resources["statuses"]["UN_AUTH"], mimetype=web_resources["content_type"])
 
     command_list = []
     for cog in bot.cogs:
         command_list.append({"cog_name": cog, "commands": list(map(lambda x: ({"name": x.name, "usage": x.signature, "description": x.help}), bot.get_cog_commands(cog)))})
-    return Response(json.dumps(command_list), status=statuses["OK"], mimetype=content_type)
+    return Response(json.dumps(command_list), status=web_resources["statuses"]["OK"], mimetype=web_resources["content_type"])
 
 
 def start_web():
