@@ -1,13 +1,13 @@
 import asyncio
 import datetime
 import json
+import discord
 import os
 import cairosvg
 import random
+import requests
 import urllib
 import urllib.parse
-import discord
-import requests
 import re
 
 import aiohttp
