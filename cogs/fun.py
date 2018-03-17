@@ -7,8 +7,6 @@ import re
 import requests
 import aiohttp
 from discord.ext import commands
-import re
-import requests
 
 import config
 from cogs.utils import image
