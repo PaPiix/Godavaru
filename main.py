@@ -38,12 +38,21 @@ class Godavaru(commands.Bot):
         self.weeb_types = []
         self.webhook = discord.Webhook.partial(int(config.webhook_id), config.webhook_token,
                                                adapter=discord.RequestsWebhookAdapter())
+        self.command_list = []
+
         for extension in initial_extensions:
             try:
                 self.load_extension(extension)
             except Exception:
                 print(f'Failed to load extension {extension}.')
                 print(traceback.format_exc())
+
+    def update_commands(self):
+        self.command_list = []
+        for cog in self.cogs:
+            self.command_list.append({"cog_name": cog, "commands": list(
+                map(lambda x: ({"name": x.name, "usage": x.signature, "description": x.help}),
+                    self.get_cog_commands(cog)))})
 
     # noinspection PyAttributeOutsideInit
     async def on_ready(self):
@@ -205,10 +214,7 @@ web_resources = {
     "content_type": "application/json"
 }
 
-command_list = []
-for cog in bot.cogs:
-    command_list.append({"cog_name": cog, "commands": list(
-        map(lambda x: ({"name": x.name, "usage": x.signature, "description": x.help}), bot.get_cog_commands(cog)))})
+bot.update_commands()
 
 
 @app.route("/commands")
@@ -221,7 +227,7 @@ def get_commands():
     if auth != config.api_token:
         return Response(json.dumps({"msg": "Unauthorized"}), status=web_resources["statuses"]["UN_AUTH"], mimetype=web_resources["content_type"])
 
-    return Response(json.dumps(command_list), status=web_resources["statuses"]["OK"], mimetype=web_resources["content_type"])
+    return Response(json.dumps(bot.command_list), status=web_resources["statuses"]["OK"], mimetype=web_resources["content_type"])
 
 
 def start_web():

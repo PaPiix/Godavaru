@@ -107,7 +107,8 @@ class Owner:
         try:
             self.bot.unload_extension('cogs.' + extension)
             self.bot.load_extension('cogs.' + extension)
-            await ctx.send(f":ok_hand: Reloaded /cogs/{extension}.py")
+            self.bot.update_commands()
+            await ctx.send(f":ok_hand: Reloaded /cogs/{extension}.py\nThere are now `{len(self.bot.commands)}` commands in `{len(self.bot.cogs)}` cogs loaded")
         except Exception:
             await ctx.send(f":sob: I-I'm sorry, I couldn't reload the `{extension}` module >w< "
                            + f"```py\n{traceback.format_exc()}```")
@@ -117,7 +118,8 @@ class Owner:
     async def unload(self, ctx, *, extension: str):
         """Unload an extension (Bot Owner Only)"""
         self.bot.unload_extension("cogs." + extension)
-        await ctx.send(f":ok_hand: Unloaded /cogs/{extension}.py")
+        self.bot.update_commands()
+        await ctx.send(f":ok_hand: Unloaded /cogs/{extension}.py\nThere are now `{len(self.bot.commands)}` commands in `{len(self.bot.cogs)}` cogs loaded")
 
     @commands.command()
     @commands.check(is_owner)
@@ -125,7 +127,8 @@ class Owner:
         """Load an extension (Bot Owner Only)"""
         try:
             self.bot.load_extension("cogs." + extension)
-            await ctx.send(f":ok_hand: Loaded /cogs/{extension}.py")
+            self.bot.update_commands()
+            await ctx.send(f":ok_hand: Loaded /cogs/{extension}.py\nThere are now `{len(self.bot.commands)}` commands in `{len(self.bot.cogs)}` cogs loaded")
         except Exception:
             await ctx.send(f":sob: I-I'm sorry, I couldn't load the `{extension}` module >w< "
                            + f"```py\n{traceback.format_exc()}```")
