@@ -30,9 +30,11 @@ class Info:
         self.bot = bot
 
     @commands.command()
-    async def roleinfo(self, ctx, *, role: discord.Role):
+    async def roleinfo(self, ctx, *, role: discord.Role = None):
         """Get information on a role.
         Note that the role name is case sensitive. If the role name is `Member`, then you must pass the role argument as `Member` and not `member`."""
+        if role is None:
+            role = ctx.author.top_role
         em = discord.Embed(title="Role Info", description="Information for role **{}**".format(role.name),
                            color=role.color)
         em.add_field(name="Permissions", value=role.permissions.value, inline=True)
