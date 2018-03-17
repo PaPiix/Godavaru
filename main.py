@@ -205,6 +205,11 @@ web_resources = {
     "content_type": "application/json"
 }
 
+command_list = []
+for cog in bot.cogs:
+    command_list.append({"cog_name": cog, "commands": list(
+        map(lambda x: ({"name": x.name, "usage": x.signature, "description": x.help}), bot.get_cog_commands(cog)))})
+
 
 @app.route("/commands")
 def get_commands():
@@ -216,9 +221,6 @@ def get_commands():
     if auth != config.api_token:
         return Response(json.dumps({"msg": "Unauthorized"}), status=web_resources["statuses"]["UN_AUTH"], mimetype=web_resources["content_type"])
 
-    command_list = []
-    for cog in bot.cogs:
-        command_list.append({"cog_name": cog, "commands": list(map(lambda x: ({"name": x.name, "usage": x.signature, "description": x.help}), bot.get_cog_commands(cog)))})
     return Response(json.dumps(command_list), status=web_resources["statuses"]["OK"], mimetype=web_resources["content_type"])
 
 
