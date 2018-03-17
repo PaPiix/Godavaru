@@ -197,19 +197,11 @@ def start_bot():
 
 
 @app.route("/commands")
-def hello():
-
-    command_name_list = []
-    command_usage_list = []
-    command_help_list = []
-    command_cogs_list = []
-    for command in list(bot.commands):
-        command_name_list.append(command.name)
-        command_usage_list.append(command.signature)
-        command_help_list.append(command.help)
-        command_cogs_list.append(command.cog_name)
-    json_array = [{"name": n, "usage": u, "description": h, "cog": c} for n, u, h, c in zip(command_name_list, command_usage_list, command_help_list, command_cogs_list)]
-    resp = Response(json.dumps(json_array))
+def get_commands():
+    command_list = []
+    for cog in bot.cogs:
+        command_list.append({"cog_name": cog, "commands": list(map(lambda x: ({"name": x.name, "usage": x.signature}), bot.get_cog_commands(cog)))})
+    resp = Response(json.dumps(command_list))
     resp.headers["content-type"] = "json"
     return resp
 
